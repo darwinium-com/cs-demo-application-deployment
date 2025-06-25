@@ -47,7 +47,7 @@ This guide was developed and tested using the following values:
 * **GUIDE_API_KEY_HEADER:** `dwn-api-auth`
 * **GUIDE_API_KEY:** `1qaz@WSX3edc$RFV`
 
-> [! CAUTION]
+> [!CAUTION]
 > The above variable names prefixed with `GUIDE_` are names that only appear within this guide and are not the names
 > of the variables within the code files.  These variables will be used within the guide to reference these key pieces
 > of information needed for the deployment.
@@ -75,8 +75,8 @@ must take care to use them consistently throughout the guide.
 3. Create S3 Bucket
     * [AWS S3 Documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html])
     * The only recommended change to the default is to `disable` the `Bucket Key`
-    > [!WARNING]
-    > Take note of the bucket name.  You will need it in following steps.
+> [!WARNING]
+> Take note of the bucket name.  You will need it in following steps.
 4. Upload the following files from the `/application-deployment-guide/resources-backend` directory of this repository
    * authorizer-handler.zip
    * echo-handler.zip
@@ -91,10 +91,10 @@ must take care to use them consistently throughout the guide.
 9. Copy the Object URL of the Cloudformation `.yaml` into the `Amazon S3 URL` field
 10. Click `Next`
 
-    > [!Warning]
-    > The Cloudformation Template is set up with several customizable parameters. Take note of the sub-bullets in the
-    > step.
-    > 
+> [!Warning]
+> The Cloudformation Template is set up with several customizable parameters. Take note of the sub-bullets in the
+> step.
+
 11. Fill out the required parameters for the template. Parameter explanations follow:
     * `Stack Name`
       * This should be something unique but also relatively indicative the resources to be deployed.
@@ -123,7 +123,7 @@ must take care to use them consistently throughout the guide.
 14. Scroll to the bottom of the screen and check the `I acknowledge...` box
 15. Click `Next`
 16. Click `Submit`
-    > [! NOTE]
+    > [!NOTE]
     > The Cloudformation Template will now run and deploy the backend resources.
 17. Once the Cloudformation Template is complete, click on the `Outputs` tab of the right panel
     * Here you will find the key information you'll need in Phase 3 of the Guide:
