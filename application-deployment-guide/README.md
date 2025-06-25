@@ -175,12 +175,14 @@ must take care to use them consistently throughout the guide.
 8. Copy the `SSH` clone link
 9. Return to your terminal and run the following code
 
+```shell
+   git clone git@github.com:{{username}}/{{username}}.github.io.git
+```
+
 > [!WARNING] 
 > Be sure to swap out the `{{username}}` text in the command below
 
-    ```shell
-   git clone git@github.com:{{username}}/{{username}}.github.io.git
-    ```
+    
 10. Open your file explore
 11. Navigate to the `/application-deployment-guide/resources-frontend` directory of this repository
 12. Copy the contents of the directory
@@ -336,7 +338,8 @@ must take care to use them consistently throughout the guide.
 
 30. Click `Save`
 
-> [!TIP] CONGRATULATIONS!!! The Demo Application Resources have been deployed and should be ready to use.
+> [!TIP] 
+> CONGRATULATIONS!!! The Demo Application Resources have been deployed and should be ready to use.
 
 ## Next Steps
 
