@@ -75,8 +75,10 @@ must take care to use them consistently throughout the guide.
 3. Create S3 Bucket
     * [AWS S3 Documentation](https://docs.aws.amazon.com/AmazonS3/latest/userguide/create-bucket-overview.html])
     * The only recommended change to the default is to `disable` the `Bucket Key`
+
 > [!WARNING]
 > Take note of the bucket name.  You will need it in following steps.
+
 4. Upload the following files from the `/application-deployment-guide/resources-backend` directory of this repository
    * authorizer-handler.zip
    * echo-handler.zip
@@ -114,8 +116,10 @@ must take care to use them consistently throughout the guide.
       * If you didn't edit the file names, it will be `echo-handler`
     * `LambdaCodeBucket`
       * This is the name of the S3 Bucket you created to house the `.zip` and `.yaml` files
-    > [!Warning]
-    > This is the name of the bucket... NOT the bucket url
+
+> [!Warning]
+> This is the name of the bucket... NOT the bucket url
+
     * `StageName` 
       * You can keep this set as `dev` but you could customize it if you'd like. Must be all one word.
 12. Click `Next`
@@ -123,8 +127,10 @@ must take care to use them consistently throughout the guide.
 14. Scroll to the bottom of the screen and check the `I acknowledge...` box
 15. Click `Next`
 16. Click `Submit`
-    > [!NOTE]
-    > The Cloudformation Template will now run and deploy the backend resources.
+
+> [!NOTE]
+> The Cloudformation Template will now run and deploy the backend resources.
+
 17. Once the Cloudformation Template is complete, click on the `Outputs` tab of the right panel
     * Here you will find the key information you'll need in Phase 3 of the Guide:
       * `ApiBaseUrl` the base URL (minus the resource string `/api/echo`)
@@ -144,12 +150,14 @@ must take care to use them consistently throughout the guide.
 2. **Result:** Fully Formed GitHub Pages repository set to host repository contents at Custom Domain
 
 #### Steps:
+
 > [!WARNING]
 > The following steps that involve git commands in the terminal assume you're using Linux or MacOS.
 > For Windows, please refer to appropriate Windows git command references available on the internet.
 
 > [!NOTE]
 > Steps 1-17 are based on the instructions found at the [GitHub Pages Marketing Site](https://pages.github.com/)
+
 1. Log into [GitHub](https://github.com)
 2. Create a new `Public` repository with the name `{{username}}.github.io` where you replace the `{{username}}` with your username
     * Do not add a `README` file
@@ -166,16 +174,20 @@ must take care to use them consistently throughout the guide.
 7. Click on the green `Code` dropdown button
 8. Copy the `SSH` clone link
 9. Return to your terminal and run the following code
-    > [!WARNING] 
-    > Be sure to swap out the `{{username}}` text in the command below
+
+> [!WARNING] 
+> Be sure to swap out the `{{username}}` text in the command below
+
     ```shell
    git clone git@github.com:{{username}}/{{username}}.github.io.git
     ```
 10. Open your file explore
 11. Navigate to the `/application-deployment-guide/resources-frontend` directory of this repository
 12. Copy the contents of the directory
-    > [!WARNING]
-    > Be sure to copy the contents and not the directory itself. 
+
+> [!WARNING]
+> Be sure to copy the contents and not the directory itself. 
+
 13. Navigate back to our GitHub pages directory and paste the copied contents into the root of the repo
 14. Add the files to git repo by running the following command
     ```shell
@@ -191,11 +203,15 @@ must take care to use them consistently throughout the guide.
     ```
 17. Open a new browser tab and navigate to `https://{{username}}.github.io`
 18. Complete the steps in GitHub Pages Documentation to "[Manage a custom domain](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site)"
-    > [!NOTE]
-    > These instructions state to create an ALIAS or ANAME record however a CNAME record with the same configuration works as well
+
+> [!NOTE]
+> These instructions state to create an ALIAS or ANAME record however a CNAME record with the same configuration works as well
+
 19. Return to your terminal and run the following git command to get the latest of the repository
-    > [!NOTE]
-    > As part of the setup for a custom domain, GitHub will auto commit a CNAME file in the repo so you'll need to retrieve the latest.
+
+> [!NOTE]
+> As part of the setup for a custom domain, GitHub will auto commit a CNAME file in the repo so you'll need to retrieve the latest.
+
     ```shell
     git pull origin master
     ```
@@ -217,8 +233,10 @@ must take care to use them consistently throughout the guide.
 5. Click `Continue`
 6. Select `Free` plan
 7. Validate that your A, AAAA, and CNAME Records from your existing DNS have been detected for import
-   > [!WARNING]
-   > If they are not detected for import, you can add them manually using the `Add record` button.
+
+> [!WARNING]
+> If they are not detected for import, you can add them manually using the `Add record` button.
+
 8. Click `Continue to activation`
 9. Open a new browser tab and navigate to the Domain Registrar for your Custom Domain
 10. Update your Domain's Nameservers to the Cloudflare servers according to the instructions provided
@@ -227,8 +245,10 @@ must take care to use them consistently throughout the guide.
     * It may take some time for the change to propagate through the Global DNS system
 13. Once nameservers are up-to-date and checked in cloudflare, open a terminal
 14. Run the following command
-    > [!WARNING]
-    > Be sure to swap out the `{{mycustomdomain.com}}` text in the command below
+
+> [!WARNING]
+> Be sure to swap out the `{{mycustomdomain.com}}` text in the command below
+
     ```shell
     curl -I {{mycustomdomain.com}}
     ```
@@ -253,8 +273,10 @@ must take care to use them consistently throughout the guide.
 5. Select `Start with Hello World`
 6. Name worker `proxy-frontend-api-requests-to-backed-api`
 7. Click `Deploy`
-   > [!WARNING]
-   > Cloudflare is super confusing, but this will deploy a simple hello world worker that we will then edit and redeploy
+
+> [!WARNING]
+> Cloudflare is super confusing, but this will deploy a simple hello world worker that we will then edit and redeploy
+
 8. Click `Edit code`
 9. Copy and Paste in contents of `proxy-to-backend-api.js` file located in `/application-deployment-guide/resources-cloudflare` directory of this repository
 10. Click `Deploy`
@@ -279,8 +301,10 @@ must take care to use them consistently throughout the guide.
 23. Click `+ Create rule` button
 24. Select `Request Header Transform Rule` from the drop-down menu
 25. Create the rule with the following settings:
-    > [!WARNING]
-    > Be sure to swap out the `{{GUIDE_API_KEY_HEADER}}` and `{{GUIDE_API_KEY_HEADER}}` appropriately
+
+> [!WARNING]
+> Be sure to swap out the `{{GUIDE_API_KEY_HEADER}}` and `{{GUIDE_API_KEY_HEADER}}` appropriately
+
     * **Rule Name:** Add backend-api-key to /api/* requests
     * **If incoming requests match:** Custom filter expression
       * **Field:** URI Path
@@ -293,15 +317,20 @@ must take care to use them consistently throughout the guide.
     * **Place at**
       * **Select Order:** First
 26. Click `Deploy`
-    > [!WARNING]
-    > Be sure to verify the rule is `active` in the rules list. If it is not, use the ellipsis dropdown to `enable`
-    > [!NOTE]
-    > This rule will be your main point of security for your backend api. When not using your demo app, it is recommended that you disable the rule.
+    
+> [!WARNING]
+> Be sure to verify the rule is `active` in the rules list. If it is not, use the ellipsis dropdown to `enable`
+
+> [!NOTE]
+> This rule will be your main point of security for your backend api. When not using your demo app, it is recommended that you disable the rule.
+
 27. Select `Workers Routes` from Left Menu
 28. Click `Add Route` button
 29. Configure route with the following settings:
-    > [!WARNING]
-    > Be sure to swap out the `{{mycustomdomain.com}}` appropriately
+
+> [!WARNING]
+> Be sure to swap out the `{{mycustomdomain.com}}` appropriately
+
     * **Route:** `{{mycustomdomain.com}}/api/*`
     * **Worker:** `proxy-frontend-api-requests-to-backed-api`
 30. Click `Save`
