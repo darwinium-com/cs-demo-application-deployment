@@ -249,7 +249,7 @@ must take care to use them consistently throughout the guide.
 14. Run the following command
 
     ```shell
-        curl -I {{mycustomdomain.com}}
+    curl -I {{mycustomdomain.com}}
     ```
 
 > [!WARNING]
@@ -347,4 +347,4 @@ You can now navigate to your custom domain and use the Demo Application's basic 
 is intended to be very simplistic and offer just enough network events to deploy the Darwinium Journey resources for
 experimentation and learning on the platform.
 
-Check out the [Darwinium Journey Guide README](darwinium-journey-guide/README.md) for further guidance.
+Check out the [Darwinium Journey Guide README](/darwinium-journey-guide/README.md) for further guidance.
