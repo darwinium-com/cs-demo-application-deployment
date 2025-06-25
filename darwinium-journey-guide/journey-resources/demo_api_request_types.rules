@@ -1,0 +1,48 @@
+version: 1
+checksum: VxW1rIDzRV2asDrQi3DNSQ==
+decision_type: scoringModel
+rules:
+  - type: if
+    properties:
+      condition: transaction.purpose = "login-submit"
+      signal: ""
+      category: ""
+      score: 0
+      comment: ""
+    children:
+      - type: setAttribute
+        properties:
+          attribute: event_type
+          value: '"account_login"'
+          signal: ""
+          category: ""
+          score: 0
+          comment: ""
+      - type: else
+        properties:
+          comment: ""
+        children: []
+        expanded: true
+    expanded: true
+  - type: if
+    properties:
+      condition: transaction.purpose = "logout"
+      signal: ""
+      category: ""
+      score: 0
+      comment: ""
+    children:
+      - type: setAttribute
+        properties:
+          attribute: event_type
+          value: '"account_logout"'
+          signal: ""
+          category: ""
+          score: 0
+          comment: ""
+      - type: else
+        properties:
+          comment: ""
+        children: []
+        expanded: true
+    expanded: true

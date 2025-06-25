@@ -1,0 +1,203 @@
+api_version: darwinium.com/api/journey/v1
+journey_name: login
+steps:
+  - step_name: View Homepage
+    proxy_event:
+      url: /
+      host: demohost
+      method: GET
+      url_match_type: Exact
+      request:
+        multipart_body_rules: []
+        header_rules: []
+        url_rule:
+          query: []
+      response:
+        header_rules: []
+        body_rule:
+          html:
+            - name: /html/head
+              apply_template:
+                name: inject_dwn_profiling
+                arguments:
+                  - name: extension_detection
+                    value: true
+                  - name: remote_desktop_detection
+                    value: false
+                  - name: profiling_debug
+                    value: true
+                  - name: use_deep_query_selector
+                    value: true
+                  - name: device_sensor
+                    value: false
+                  - name: geo_location
+                    value: false
+                  - name: sensor_bm
+                    value: true
+                  - name: touch_bm
+                    value: true
+                  - name: mouse_bm
+                    value: true
+                  - name: key_bm
+                    value: true
+                  - name: field_form_selector
+                    value: none
+                  - name: post_whitelist
+                    value: /api/echo
+                  - name: profiling_in_header
+                    value: fetch
+    event_type: home_page
+  - step_name: View Login
+    proxy_event:
+      url: /login/
+      host: demohost
+      method: GET
+      url_match_type: Exact
+      request:
+        multipart_body_rules: []
+        header_rules: []
+        url_rule:
+          query: []
+      response:
+        header_rules: []
+        body_rule:
+          html:
+            - name: /html/head
+              apply_template:
+                name: inject_dwn_profiling
+                arguments:
+                  - name: extension_detection
+                    value: true
+                  - name: remote_desktop_detection
+                    value: false
+                  - name: profiling_debug
+                    value: true
+                  - name: use_deep_query_selector
+                    value: true
+                  - name: device_sensor
+                    value: false
+                  - name: geo_location
+                    value: false
+                  - name: sensor_bm
+                    value: true
+                  - name: touch_bm
+                    value: true
+                  - name: mouse_bm
+                    value: true
+                  - name: key_bm
+                    value: true
+                  - name: field_form_selector
+                    value: none
+                  - name: post_whitelist
+                    value: /api/echo
+                  - name: profiling_in_header
+                    value: fetch
+            - name: /html/head
+              apply_template:
+                name: key_bm_map_delay
+                arguments:
+                  - name: bm_context
+                    value: USER_NAME
+                  - name: field_selector
+                    value: input#usernameInput
+            - name: /html/head
+              apply_template:
+                name: key_bm_map_delay
+                arguments:
+                  - name: bm_context
+                    value: PASSWORD
+                  - name: field_selector
+                    value: input#passwordInput
+    event_type: page_land
+  - step_name: View Account
+    proxy_event:
+      url: /account/
+      host: demohost
+      method: GET
+      url_match_type: Exact
+      request:
+        multipart_body_rules: []
+        header_rules: []
+        url_rule:
+          query: []
+      response:
+        header_rules: []
+        body_rule:
+          html:
+            - name: /html/head
+              apply_template:
+                name: inject_dwn_profiling
+                arguments:
+                  - name: extension_detection
+                    value: true
+                  - name: remote_desktop_detection
+                    value: false
+                  - name: profiling_debug
+                    value: true
+                  - name: use_deep_query_selector
+                    value: true
+                  - name: device_sensor
+                    value: false
+                  - name: geo_location
+                    value: false
+                  - name: sensor_bm
+                    value: true
+                  - name: touch_bm
+                    value: true
+                  - name: mouse_bm
+                    value: true
+                  - name: key_bm
+                    value: true
+                  - name: field_form_selector
+                    value: none
+                  - name: post_whitelist
+                    value: /api/echo
+                  - name: profiling_in_header
+                    value: fetch
+    event_type: page_land
+  - step_name: Request to Demo API
+    proxy_event:
+      url: /api/echo
+      host: demohost
+      method: POST
+      url_match_type: Exact
+      request:
+        header_rules: []
+        url_rule:
+          query: []
+        body_rule:
+          jsonpath:
+            - name: $.type
+              extract_to_attribute: transaction.purpose
+            - name: $.data.email
+              extract_to_attribute: identity['ACCOUNT'].email['PERSONAL'].email
+      response:
+        header_rules: []
+        body_rule:
+          jsonpath:
+            - name: $.statusCode
+              extract_to_attribute: custom.general_purpose['demo_api_status_code']
+    import_dependencies: []
+    models:
+      - name: set-request-type
+        dependencies:
+          - LOCAL.REQUEST
+        execute_code: src/demo_api_request_types.rules
+      - name: set-request-outcome
+        dependencies:
+          - LOCAL.REQUEST
+          - LOCAL.RESPONSE
+        execute_code: src/demo_api_outcome_types.rules
+    event_type: api_request
+snippets:
+  - dwn_profiling.snippet
+cookies:
+  - name: dwn_dvc
+    generate: true
+    scope: device_only
+    max_age: 31557600
+    same_site: lax
+  - name: dwn_sess
+    generate: true
+    scope: session_only
+    same_site: lax

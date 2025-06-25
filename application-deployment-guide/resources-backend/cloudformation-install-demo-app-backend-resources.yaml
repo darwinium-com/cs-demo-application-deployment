@@ -1,0 +1,210 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: darwinium-demo-app-backend - Lambda + API Gateway stack with custom authorizer and echo endpoint
+
+Parameters:
+  APIKeys:
+    Type: String
+    Description: Comma-separated list of API keys (each key must be at least 12 characters)
+    AllowedPattern: ^([a-zA-Z0-9!@#$]{12,})(,[a-zA-Z0-9!@#$]{12,})*$
+    ConstraintDescription: Each API key must be at least 12 characters long and only contain letters, numbers, or the symbols !@#$
+
+  StageName:
+    Type: String
+    Description: Name of the API Gateway stage (e.g., dev, prod)
+    Default: dev
+    AllowedPattern: ^[a-zA-Z0-9-_]+$
+    ConstraintDescription: Stage name must be alphanumeric with optional hyphens or underscores
+
+  LambdaCodeBucket:
+    Type: String
+    Description: Name of the S3 bucket containing Lambda .zip files
+    AllowedPattern: ^[a-z0-9]([a-z0-9.-]{1,61}[a-z0-9])?$
+    ConstraintDescription: Must be a valid S3 bucket name (3-63 characters, lowercase letters, numbers, dots, and hyphens; must start and end with a letter or number)
+
+  AuthorizerCodeKey:
+    Type: String
+    Description: S3 key filename (without .zip) for the Lambda authorizer (e.g., 'authorizer-handler')
+    Default: authorizer-handler
+    MinLength: 1
+
+  EchoCodeKey:
+    Type: String
+    Description: S3 key filename (without .zip) for the Lambda echo function (e.g., 'echo-handler')
+    Default: echo-handler
+    MinLength: 1
+
+  AuthorizerTokenSource:
+    Type: String
+    Description: Header key used for Lambda authorizer token
+    Default: dwn-api-auth
+
+Resources:
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: LambdaAuthExecutionRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: LambdaBasicExecution
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+
+  AuthLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: darwinium-demo-authorizer
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Handler: !Sub "${AuthorizerCodeKey}.handler"
+      Environment:
+        Variables:
+          API_KEYS_CSV: !Ref APIKeys
+      Code:
+        S3Bucket: !Ref LambdaCodeBucket
+        S3Key: !Sub "${AuthorizerCodeKey}.zip"
+
+  SimpleResponseFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: darwinium-demo-simple-responder
+      Runtime: nodejs22.x
+      Architectures:
+        - arm64
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Handler: !Sub "${EchoCodeKey}.handler"
+      Code:
+        S3Bucket: !Ref LambdaCodeBucket
+        S3Key: !Sub "${EchoCodeKey}.zip"
+
+  EchoApiGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: !Sub "${AWS::StackName}-echo-api"
+
+  EchoApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt EchoApiGateway.RootResourceId
+      PathPart: api
+      RestApiId: !Ref EchoApiGateway
+
+  EchoApiSubResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !Ref EchoApiResource
+      PathPart: echo
+      RestApiId: !Ref EchoApiGateway
+
+  LambdaAuthorizer:
+    Type: AWS::ApiGateway::Authorizer
+    Properties:
+      Name: LambdaTokenAuthorizer
+      Type: TOKEN
+      AuthorizerUri:
+        Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${AuthLambdaFunction.Arn}/invocations
+      IdentitySource: !Sub method.request.header.${AuthorizerTokenSource}
+      RestApiId: !Ref EchoApiGateway
+      AuthorizerResultTtlInSeconds: 0
+
+  EchoApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: CUSTOM
+      AuthorizerId: !Ref LambdaAuthorizer
+      HttpMethod: POST
+      ResourceId: !Ref EchoApiSubResource
+      RestApiId: !Ref EchoApiGateway
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS
+        Uri:
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SimpleResponseFunction.Arn}/invocations
+        RequestTemplates:
+          application/json: |
+            {
+              "body" : $input.json('$'),
+              "headers": {
+                #foreach($header in $input.params().header.keySet())
+                "$header": "$util.escapeJavaScript($input.params().header.get($header))"#if($foreach.hasNext),#end
+                #end
+              },
+              "method": "$context.httpMethod",
+              "params": {
+                #foreach($param in $input.params().path.keySet())
+                "$param": "$util.escapeJavaScript($input.params().path.get($param))"#if($foreach.hasNext),#end
+                #end
+              },
+              "query": {
+                #foreach($queryParam in $input.params().querystring.keySet())
+                "$queryParam": "$util.escapeJavaScript($input.params().querystring.get($queryParam))"#if($foreach.hasNext),#end
+                #end
+              }  
+            }
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: 200
+            ResponseTemplates:
+              application/json: ''
+      MethodResponses:
+        - StatusCode: 200
+          ResponseModels:
+            application/json: 'Empty'
+
+  EchoApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: EchoApiMethod
+    Properties:
+      RestApiId: !Ref EchoApiGateway
+      StageName: !Ref StageName
+
+  LambdaInvokePermissionForApi:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref SimpleResponseFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Sub: arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${EchoApiGateway}/*/POST/api/echo
+
+  LambdaInvokePermissionForAuthorizer:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AuthLambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Sub: arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${EchoApiGateway}/authorizers/*
+
+Outputs:
+  ApiBaseUrl:
+    Description: Base URL of the API Gateway
+    Value:
+      Fn::Sub: https://${EchoApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${StageName}
+
+  AuthorizedApiKeys:
+    Description: Plain-text API keys for development use (Comma-separated list)
+    Value: !Ref APIKeys
+
+  ApiKeyHeader:
+    Description: The header key expected to contain the authorized API Key
+    Value: !Ref AuthorizerTokenSource
+
+  ApiTestUrl:
+    Description: The URL you can use to validate the API with Postman POST request
+    Value:
+      Fn::Sub: https://${EchoApiGateway}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/api/echo

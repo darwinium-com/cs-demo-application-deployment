@@ -1,0 +1,11 @@
+body {
+    background-color: #20104f;
+    color: white;
+    padding: 40px 20px;
+}
+.text-center {
+    text-align: center;
+}
+*:disabled{
+    cursor: not-allowed;
+}

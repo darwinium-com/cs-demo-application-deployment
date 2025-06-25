@@ -1,0 +1,12 @@
+journeys:
+  - login.journey.yaml
+targets:
+  - name: cloudflare
+    type: cloudflare
+    enabled: true
+    valid_host_list:
+      - demohost
+  - name: cloudfront
+    type: cloudfront
+    enabled: false
+    valid_host_list: []

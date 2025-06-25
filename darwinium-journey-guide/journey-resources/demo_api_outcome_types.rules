@@ -1,0 +1,88 @@
+version: 1
+checksum: HI28p4XO6nLoSyr1S93SFQ==
+decision_type: scoringModel
+rules:
+  - type: if
+    properties:
+      condition: transaction.purpose = 'login-submit'
+      signal: ""
+      category: ""
+      score: 0
+      comment: ""
+    children:
+      - type: if
+        properties:
+          condition: custom.general_purpose['demo_api_status_code'] = '200'
+          signal: ""
+          category: ""
+          score: 0
+          comment: ""
+        children:
+          - type: setAttribute
+            properties:
+              attribute: event_type
+              value: "'account_login_success'"
+              signal: ""
+              category: ""
+              score: 0
+              comment: ""
+          - type: else
+            properties:
+              comment: ""
+            children:
+              - type: if
+                properties:
+                  condition: custom.general_purpose['demo_api_status_code'] = '401'
+                  signal: ""
+                  category: ""
+                  score: 0
+                  comment: ""
+                children:
+                  - type: setAttribute
+                    properties:
+                      attribute: event_type
+                      value: "'account_login_failed'"
+                      signal: ""
+                      category: ""
+                      score: 0
+                      comment: ""
+                  - type: else
+                    properties:
+                      comment: ""
+                    children: []
+      - type: else
+        properties:
+          comment: ""
+        children: []
+  - type: if
+    properties:
+      condition: transaction.purpose = 'logout'
+      signal: ""
+      category: ""
+      score: 0
+      comment: ""
+    children:
+      - type: if
+        properties:
+          condition: custom.general_purpose['demo_api_status_code'] = '200'
+          signal: ""
+          category: ""
+          score: 0
+          comment: ""
+        children:
+          - type: setAttribute
+            properties:
+              attribute: event_type
+              value: "'account_logout'"
+              signal: ""
+              category: ""
+              score: 0
+              comment: ""
+          - type: else
+            properties:
+              comment: ""
+            children: []
+      - type: else
+        properties:
+          comment: ""
+        children: []
