@@ -116,12 +116,12 @@ must take care to use them consistently throughout the guide.
       * If you didn't edit the file names, it will be `echo-handler`
     * `LambdaCodeBucket`
       * This is the name of the S3 Bucket you created to house the `.zip` and `.yaml` files
+    * `StageName`
+        * You can keep this set as `dev` but you could customize it if you'd like. Must be all one word.
 
 > [!Warning]
-> This is the name of the bucket... NOT the bucket url
+> Make sure the LambdaCodeBucket is the name of the bucket... NOT the bucket url
 
-    * `StageName` 
-      * You can keep this set as `dev` but you could customize it if you'd like. Must be all one word.
 12. Click `Next`
 13. No changes are needed to the optional Stack Options
 14. Scroll to the bottom of the screen and check the `I acknowledge...` box
@@ -207,10 +207,10 @@ must take care to use them consistently throughout the guide.
 > [!NOTE]
 > These instructions state to create an ALIAS or ANAME record however a CNAME record with the same configuration works as well
 
-19. Return to your terminal and run the following git command to get the latest of the repository
-
 > [!NOTE]
 > As part of the setup for a custom domain, GitHub will auto commit a CNAME file in the repo so you'll need to retrieve the latest.
+
+19. Return to your terminal and run the following git command to get the latest of the repository
 
     ```shell
     git pull origin master
@@ -246,12 +246,13 @@ must take care to use them consistently throughout the guide.
 13. Once nameservers are up-to-date and checked in cloudflare, open a terminal
 14. Run the following command
 
+```shell
+    curl -I {{mycustomdomain.com}}
+```
+
 > [!WARNING]
 > Be sure to swap out the `{{mycustomdomain.com}}` text in the command below
 
-    ```shell
-    curl -I {{mycustomdomain.com}}
-    ```
 15. Look at the output for `CF-Ray:` and/or `CF-Cache-Status:` lines which indicate Cloudflare is successfully fronting the demo app
 
 ### Part 4: Configure Cloudflare to proxy requests to `/api/*` to Demo App AWS API Gateway
@@ -301,10 +302,6 @@ must take care to use them consistently throughout the guide.
 23. Click `+ Create rule` button
 24. Select `Request Header Transform Rule` from the drop-down menu
 25. Create the rule with the following settings:
-
-> [!WARNING]
-> Be sure to swap out the `{{GUIDE_API_KEY_HEADER}}` and `{{GUIDE_API_KEY_HEADER}}` appropriately
-
     * **Rule Name:** Add backend-api-key to /api/* requests
     * **If incoming requests match:** Custom filter expression
       * **Field:** URI Path
@@ -316,6 +313,10 @@ must take care to use them consistently throughout the guide.
       * **Value:** `{{GUIDE_API_KEY}}`
     * **Place at**
       * **Select Order:** First
+
+> [!WARNING]
+> Be sure to swap out the `{{GUIDE_API_KEY_HEADER}}` and `{{GUIDE_API_KEY_HEADER}}` appropriately
+
 26. Click `Deploy`
     
 > [!WARNING]
@@ -327,12 +328,12 @@ must take care to use them consistently throughout the guide.
 27. Select `Workers Routes` from Left Menu
 28. Click `Add Route` button
 29. Configure route with the following settings:
+    * **Route:** `{{mycustomdomain.com}}/api/*`
+    * **Worker:** `proxy-frontend-api-requests-to-backed-api`
 
 > [!WARNING]
 > Be sure to swap out the `{{mycustomdomain.com}}` appropriately
 
-    * **Route:** `{{mycustomdomain.com}}/api/*`
-    * **Worker:** `proxy-frontend-api-requests-to-backed-api`
 30. Click `Save`
 
 > [!TIP] CONGRATULATIONS!!! The Demo Application Resources have been deployed and should be ready to use.
