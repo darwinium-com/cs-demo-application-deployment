@@ -175,9 +175,9 @@ must take care to use them consistently throughout the guide.
 8. Copy the `SSH` clone link
 9. Return to your terminal and run the following code
 
-```shell
-   git clone git@github.com:{{username}}/{{username}}.github.io.git
-```
+    ```shell
+    git clone git@github.com:{{username}}/{{username}}.github.io.git
+    ```
 
 > [!WARNING] 
 > Be sure to swap out the `{{username}}` text in the command below
@@ -248,9 +248,9 @@ must take care to use them consistently throughout the guide.
 13. Once nameservers are up-to-date and checked in cloudflare, open a terminal
 14. Run the following command
 
-```shell
-    curl -I {{mycustomdomain.com}}
-```
+    ```shell
+        curl -I {{mycustomdomain.com}}
+    ```
 
 > [!WARNING]
 > Be sure to swap out the `{{mycustomdomain.com}}` text in the command below
